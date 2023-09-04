@@ -23,15 +23,15 @@ namespace zombieGame
 
         public static void Main(string[] args)
         {
-
-            Console.WriteLine($"Height: {Convert.ToString(Console.WindowHeight)}, Widht: {Convert.ToString(Console.WindowWidth)}");
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < rng.Next(50,100); i++)
             {
                 randomDanger();
             }
+            Console.WriteLine($"Height: {Convert.ToString(Console.WindowHeight)}, Widht: {Convert.ToString(Console.WindowWidth)}");
 
             DrawDangerSpots();
             Player();
+
         }
 
         public static void Player()
