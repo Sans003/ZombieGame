@@ -6,6 +6,7 @@ namespace zombieGame
     public class Program
     {
         public static List<List<int>> dangerSpots = new List<List<int>>();
+        static Random rng = new Random();
         public enum Direction
         {
             Horizontal,
@@ -18,7 +19,8 @@ namespace zombieGame
         public static void Main(string[] args)
         {
             int i = 0;
-            while (i < 10) {
+            while (i < 15)
+            {
                 randomDanger();
                 i++;
             }
@@ -66,8 +68,7 @@ namespace zombieGame
                             break;
                     }
 
-                    Write(toWrite, x, y);
-                    renderDanger();
+                    rendering(toWrite, x, y);
                 }
                 else
                 {
@@ -75,16 +76,9 @@ namespace zombieGame
                 }
             }
         }
-        public static void renderDanger()
+        public static void rendering(char toWrite, int xx, int yy)
         {
-            foreach (List<int> coords in dangerSpots)
-            {
-                int x = coords[0];
-                int y = coords[1];
-                int size = coords[1];
-
-                DrawSpot(ConsoleColor.Red, size, x, y);
-            }
+            Write(toWrite, xx, yy);
         }
         public static void randomDanger()
         {
@@ -94,29 +88,77 @@ namespace zombieGame
             int y = rnd.Next(0, 20);
             var color = System.ConsoleColor.Red;
             int size = rnd.Next(1, 4);
-            DrawSpot(color, size, x, y);
             coords.Add(x);
             coords.Add(y);
-            coords.Add(size);
-            dangerSpots.Add(coords);
+            saveCoords(x, y);
+            for (int i = 0; i <= size; i++)
+            {
+
+                Direction direction = (Direction)rng.Next(Enum.GetNames(typeof(Direction)).Length);
+                switch (direction)
+                {
+                    case Direction.Horizontal:
+                        x++; // move right
+                        saveCoords(x, y);
+                        break;
+                    case Direction.Vertical:
+                        y++; // move down
+                        saveCoords(x, y);
+                        break;
+                    case Direction.DiagonalRightDown:
+                        x++; // move right
+                        y++; // move down
+                        saveCoords(x, y);
+                        break;
+                    case Direction.DiagonalLeftDown:
+                        x--; // move left
+                        y++; // move down
+                        saveCoords(x, y);
+                        break;
+                    case Direction.DiagonalRightUp:
+                        x++; // move right
+                        y--; // move up
+                        saveCoords(x, y);
+                        break;
+                    case Direction.DiagonalLeftUp:
+                        x--; // move left
+                        y--; // move up
+                        saveCoords(x, y);
+                        break;
+                }
+
+            }
         }
 
-       public static void DrawSpot(ConsoleColor color, int size, int x, int y)
+
+        public static void saveCoords(int x, int y)
+        {
+            List<int> coords = new List<int>();
+            coords.Add(x);
+            coords.Add(y);
+            dangerSpots.Add(coords);
+
+        }
+        public static void DrawSpot(ConsoleColor color, int x, int y, int m)
         {
             Console.BackgroundColor = color; // background color
             Console.ForegroundColor = color; // foreground color
             Console.SetCursorPosition(x, y);
 
-            for (int i = 0; i < size; i++)
-            {
-                Console.Write("█");
-            }
 
+            for (int i = 0; i < m; i++)
+            {
+
+                Console.SetCursorPosition(x, y);
+                Console.Write("█");
+
+            }
             Console.ResetColor(); // Reset color
         }
 
         public static void Write(char toWrite, int x = 0, int y = 0)
         {
+
             try
             {
                 if (x >= 0 && y >= 0)
@@ -124,6 +166,13 @@ namespace zombieGame
                     Console.Clear();
                     Console.SetCursorPosition(x, y);
                     Console.Write(toWrite);
+                    foreach (List<int> coords in dangerSpots)
+                    {
+                        int xx = coords[0];
+                        int yy = coords[1];
+
+                        DrawSpot(ConsoleColor.Red, xx, yy, dangerSpots.Count());
+                    }
                 }
             }
             catch (Exception)
