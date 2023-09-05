@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Threading;
 
 namespace zombieGame
@@ -10,6 +11,10 @@ namespace zombieGame
     {
         public static List<List<int>> dangerSpots = new List<List<int>>();
         static Random rng = new Random();
+        public static double dangerSteps = 0;
+        public static double encounterChance = 20;
+        public static double encounterProbability;
+
 
         public enum Direction
         {
@@ -68,6 +73,14 @@ namespace zombieGame
                             break;
                     }
 
+                    if (IsDangerSpot(x, y))
+                    {
+                        dangerSteps++;
+                        encounterCheck();
+                    } else
+                    {
+                        dangerSteps = 0;
+                    }
                     if (IsDangerSpot(ox, oy))
                     {
                         DrawSpot(ConsoleColor.Red, ox, oy);
@@ -84,6 +97,18 @@ namespace zombieGame
                     Thread.Sleep(100);
                 }
             }
+        }
+        public static void encounterCheck()
+        {
+            encounterProbability = encounterChance + 10 * (2 + Math.Exp(+dangerSteps / 2));
+            Console.WriteLine(encounterProbability);
+            if (encounterProbability >= 100) {
+                startRandomEncounter(encounterProbability);
+            }
+        }
+        public static void startRandomEncounter(double encounterProbability)
+        {
+            //Console
         }
         public static bool IsDangerSpot(int x, int y)
         {
@@ -188,3 +213,5 @@ namespace zombieGame
         }
     }
 }
+
+
